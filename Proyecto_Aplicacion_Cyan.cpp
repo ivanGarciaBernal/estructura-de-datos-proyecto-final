@@ -5,12 +5,24 @@
 #include <fstream>
 #include <sstream>
 #include <clocale>
+#include <iomanip>
 #include <windows.h>
 
-//#define endl "\n\n"
 using namespace std;
 
-//IMPLEMENTAR contador de visitar
+
+bool existe(string archivo)
+{
+    ifstream arch(archivo.c_str());
+    return arch.good();
+}
+
+void regresa()
+{
+    system("pause");
+    system("cls");
+}
+
 void contador_visitas()
 {
     int visitas;
@@ -69,7 +81,7 @@ int opciones()
          << "3.- Agregar un elemento a la base" << endl
          << "4.- Eliminar un elemento de la base de datos" << endl
          << "5.- Muestra de nuevo la portada" << endl
-         << "6.- Muestra de nuevo información relevante acerca del Estado de Hidalgo" << endl
+         << "6.- Muestra de nuevo informacion relevante acerca del Estado de Hidalgo" << endl
          << "7.- SALIR" << endl
          << "Inserte una opcion: " ;
     cin >> respuesta;
@@ -79,10 +91,17 @@ int opciones()
 void muestra_base()
 {
     string linea;
+    cout <<
+         "ID\t" <<
+         "Nombre" <<
+         "Municipio" <<
+         "Descripcion o atracciones" <<
+         endl;
     ifstream datos("datos.txt");
     while(getline(datos,linea)) {
         cout << linea << endl;
     }
+    datos.close();
 }
 
 void carga_datos(vector<int> *id,
@@ -333,6 +352,7 @@ void ascendente()
 
 void descendente()
 {
+    int i;
     ascendente();
     vector<string> lineas;
     string linea;
@@ -343,20 +363,23 @@ void descendente()
     datos.close();
     reverse(lineas.begin(),lineas.end());
     ofstream dat("datos.txt");
-    for(auto lin: lineas) {
-        dat << lin << endl;
+
+    for(i=0; i < lineas.size(); i++) {
+        dat << lineas[i] << endl;
     }
     dat.close();
 }
-//void descendente();
+
 void ordena()
 {
     int respuesta;
     muestra_base();
-
+    cout << endl;
+respuesta:
     cout << "Tiene dos opciones: " << endl
          << "1.- Orden ascendente" << endl
          << "2.- Orden descendente" << endl
+         << "3.- Regresar al menú principal" << endl
          << "Inserte respuesta: ";
     cin >> respuesta;
 
@@ -364,16 +387,20 @@ void ordena()
         case 1:
             ascendente();
             muestra_base();
+            regresa();
             break;
         case 2:
             descendente();
             muestra_base();
+            regresa();
             break;
         case 3:
+            system("cls");
             return;
         default:
             break;
     }
+    goto respuesta;
 }
 
 void restaura()
@@ -382,11 +409,7 @@ void restaura()
     copia("backup.txt","datos.txt");
 }
 
-void regresa()
-{
-    system("pause");
-    system("cls");
-}
+
 int main()
 {
     int opcion;
@@ -419,30 +442,30 @@ opciones:
             regresa();
             break;
         case 2:
-        	system("cls");
+            system("cls");
             ordena();
             regresa();
             break;
         case 3:
-        	system("cls");
+            system("cls");
             agrega();
             regresa();
             break;
         case 4:
-        	system("cls");
+            system("cls");
             elimina();
             regresa();
             break;
         case 5:
-        	system("cls");
-        	portada();
-        	regresa();
-        	break;
+            system("cls");
+            portada();
+            regresa();
+            break;
         case 6:
-        	system("cls");
-        	acerca();
-        	regresa();
-        	break;
+            system("cls");
+            acerca();
+            regresa();
+            break;
         case 7:
             return 0;
             break;
