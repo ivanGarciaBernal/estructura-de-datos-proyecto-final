@@ -1,9 +1,11 @@
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <clocale>
+#include <windows.h>
 
 //#define endl "\n\n"
 using namespace std;
@@ -27,8 +29,11 @@ void contador_visitas()
 void portada()
 {
     cout << "Universidad Autonoma del Estado de Hidalgo" << endl
+         << endl
          << "Lugares turisticos en el Estado de Hidalgo" << endl
+         << endl
          << "Equipo Cyan:" << endl
+         << endl
          << "- Romero Juarez Jose Antonio" << endl
          << "- Eliseo Juarez de Jesus Moises" << endl
          << "- Garcia Bernal Axel Ivan" << endl;
@@ -63,7 +68,9 @@ int opciones()
          << "2.- Ordenar conjunto de datos" << endl
          << "3.- Agregar un elemento a la base" << endl
          << "4.- Eliminar un elemento de la base de datos" << endl
-         << "5.- SALIR" << endl
+         << "5.- Muestra de nuevo la portada" << endl
+         << "6.- Muestra de nuevo información relevante acerca del Estado de Hidalgo" << endl
+         << "7.- SALIR" << endl
          << "Inserte una opcion: " ;
     cin >> respuesta;
     return respuesta;
@@ -242,89 +249,109 @@ void elimina()
     muestra_base();
 }
 
-void copia(string archivo, string copia){
-	ifstream arch(archivo);
-	ofstream cop(copia);
-	string linea;
-	while(getline(arch,linea)){
-		cop << linea << "\n";
-	}
-	arch.close();
-	cop.close();
+void copia(string archivo, string copia)
+{
+    ifstream arch(archivo);
+    ofstream cop(copia);
+    string linea;
+    while(getline(arch,linea)) {
+        cop << linea << "\n";
+    }
+    arch.close();
+    cop.close();
 }
 
-int encuentra(vector<int> vec, int elemento){
-	int i;
-	for(i=0;i < vec.size();i++){
-		if(vec[i] == elemento){
-			return i;
-		}
-	}
-	return -1;
+int encuentra(vector<int> vec, int elemento)
+{
+    int i;
+    for(i=0; i < vec.size(); i++) {
+        if(vec[i] == elemento) {
+            return i;
+        }
+    }
+    return -1;
 }
 
-bool es_ordenada_asc(vector<int> id){
-	int i;
-	vector<int> v = id;
-	for(i=0;i<v.size();i++){
-		if(v[i]>v[i+1]){
-			return false;
-		}
-	}	
-	return true;
+bool es_ordenada_asc(vector<int> id)
+{
+    int i;
+    vector<int> v = id;
+    for(i=0; i<v.size(); i++) {
+        if(v[i]>v[i+1]) {
+            return false;
+        }
+    }
+    return true;
 }
 
-vector<int> extrae_ids(vector<string> lineas){
-	vector<int> id;
-	int pos;
-	string linea;
-	for(auto k: lineas){
-		pos = k.find("\t");
-		linea = k.substr(0,pos);
-		id.push_back(stoi(linea));
-	}
-	return id;
+vector<int> extrae_ids(vector<string> lineas)
+{
+    vector<int> id;
+    int pos;
+    string linea;
+    for(auto k: lineas) {
+        pos = k.find("\t");
+        linea = k.substr(0,pos);
+        id.push_back(stoi(linea));
+    }
+    return id;
 }
 
-void ascendente(){
-	int k;
-	int i = 0,j = 0;
-	vector<int> id;
-	vector<string> lineas;
-	string linea;
-	
-	ifstream datos("datos.txt");
-	
-	while(getline(datos,linea)){
-		lineas.push_back(linea);
-	}
-	
-	datos.close();
-	
-	id = extrae_ids(lineas);
-	
-	for(i=1;i<=id.size();i++){
-		for(j=0;j<= id.size() - i; j++){
-			if(id[j] > id[j+1]){
-				swap(id[j],id[j+1]);
-				swap(lineas[j],lineas[j+1]);
-			}
-		}
-	}
-	
-	ofstream dat("datos.txt");
-	for(i=1;i<=lineas.size();i++){
-		dat << lineas[i] << endl;
-	}
-	dat.close();
+void ascendente()
+{
+    int k;
+    int i = 0,j = 0;
+    vector<int> id;
+    vector<string> lineas;
+    string linea;
+
+    ifstream datos("datos.txt");
+
+    while(getline(datos,linea)) {
+        lineas.push_back(linea);
+    }
+
+    datos.close();
+
+    id = extrae_ids(lineas);
+
+    for(i=1; i<=id.size(); i++) {
+        for(j=0; j<= id.size() - i; j++) {
+            if(id[j] > id[j+1]) {
+                swap(id[j],id[j+1]);
+                swap(lineas[j],lineas[j+1]);
+            }
+        }
+    }
+
+    ofstream dat("datos.txt");
+    for(i=1; i<=lineas.size(); i++) {
+        dat << lineas[i] << endl;
+    }
+    dat.close();
 }
 
+void descendente()
+{
+    ascendente();
+    vector<string> lineas;
+    string linea;
+    ifstream datos("datos.txt");
+    while(getline(datos,linea)) {
+        lineas.push_back(linea);
+    }
+    datos.close();
+    reverse(lineas.begin(),lineas.end());
+    ofstream dat("datos.txt");
+    for(auto lin: lineas) {
+        dat << lin << endl;
+    }
+    dat.close();
+}
 //void descendente();
 void ordena()
 {
-
     int respuesta;
-
     muestra_base();
 
     cout << "Tiene dos opciones: " << endl
@@ -335,25 +362,33 @@ void ordena()
 
     switch(respuesta) {
         case 1:
-			ascendente();
-			muestra_base();
+            ascendente();
+            muestra_base();
             break;
         case 2:
-//            descendente();
+            descendente();
+            muestra_base();
             break;
+        case 3:
+            return;
         default:
             break;
     }
-
 }
 
-void restaura(){
-	remove("datos.txt");
-	copia("backup.txt","datos.txt");
+void restaura()
+{
+    remove("datos.txt");
+    copia("backup.txt","datos.txt");
+}
+
+void regresa()
+{
+    system("pause");
+    system("cls");
 }
 int main()
 {
-	restaura();
     int opcion;
     vector<int> id;
     vector<string> lugar;
@@ -361,34 +396,59 @@ int main()
     vector<string> atracciones;
 
     setlocale(LC_ALL,"");
-    portada();
-    acerca();
-    contador_visitas();
 
+    portada();
+    cout << endl;
+    acerca();
+    cout << endl;
+    contador_visitas();
+    cout << endl;
+
+opciones:
     opcion = opciones();
 
     switch(opcion) {
         case 0:
+            system("cls");
             muestra_base();
+            regresa();
             break;
         case 1:
+            system("cls");
             busca();
+            regresa();
             break;
         case 2:
+        	system("cls");
             ordena();
+            regresa();
             break;
         case 3:
+        	system("cls");
             agrega();
+            regresa();
             break;
         case 4:
+        	system("cls");
             elimina();
+            regresa();
             break;
         case 5:
+        	system("cls");
+        	portada();
+        	regresa();
+        	break;
+        case 6:
+        	system("cls");
+        	acerca();
+        	regresa();
+        	break;
+        case 7:
+            return 0;
             break;
         default:
             break;
     }
-
-
+    goto opciones;
     return 0;
 }
