@@ -17,6 +17,48 @@ bool existe(string archivo)
     return arch.good();
 }
 
+void crea(string archivo){
+	ofstream arch(archivo.c_str());
+	arch.close();
+}
+
+void escribe_datos()
+{
+	string texto = 
+        "10   Real del Monte        Mineral del Monte   Pintoresco pueblo minero con arquitectura inglesa.\n"
+        "7    Prismas Basalticos    Huasca de Ocampo    Formaciones basalticas unicas y cascadas impresionantes.\n"
+        "4    Tula                 Tula de Allende     Zona arqueologica con las famosas esculturas atlantes.\n"
+        "6    Grutas de Tolantongo  Cardonal            Grutas termales con aguas turquesas y paisajes increibles.\n"
+        "2    Pachuca              Pachuca de Soto     Capital del estado con arquitectura colonial y moderna.\n"
+        "9    Huasca de Ocampo     Huasca de Ocampo    Pueblo magico con antiguas haciendas y bosques encantadores.\n"
+        "3    Teotihuacan          Tepeji del Rio      Sitio arqueologico con piramides prehispanicas imponentes.\n"
+        "5    Santa Maria Regla    Huasca de Ocampo    Hacienda con arquitectura unica y hermosos jardines.\n"
+        "1    El Chico              Mineral del Chico   Pueblo con encanto, rodeado de bosques y cascadas.\n"
+        "8    Zimapan               Zimapan             Presa de la Esperanza, ideal para deportes acuaticos y pesca.";
+
+ofstream datos("datos.txt");
+datos << texto << endl;
+datos.close();
+}
+
+void escribe_visitas(){
+	if(!existe("visitas.txt")){
+		crea("visitas.txt");
+		ofstream visitas("visitas.txt");
+		visitas << "0" << endl;
+		visitas.close();
+	}
+}
+
+void crea_datos()
+{
+	if(!existe("datos.txt")){
+		crea("datos.txt");
+		escribe_datos();
+	}
+}
+
+
 void regresa()
 {
     system("pause");
@@ -36,6 +78,13 @@ void contador_visitas()
     visitas_out << visitas;
     cout << "Numero de visitas: " << visitas << endl;
     visitas_out.close();
+}
+
+int num_visitas(){
+	int n;
+	ifstream visitas("visitas.txt");
+	visitas >> n;
+	return n;
 }
 
 void portada()
@@ -74,7 +123,9 @@ void acerca()
 int opciones()
 {
     int respuesta;
-    cout << "Las siguientes acciones estan disponibles" << endl
+    int n = num_visitas();
+    cout << "Numero de visitas: " << n << endl
+		<< "Las siguientes acciones estan disponibles" << endl
          << "0.- Muestra la base de datos" << endl
          << "1.- Realizar busqueda en la base" << endl
          << "2.- Ordenar conjunto de datos" << endl
@@ -206,13 +257,12 @@ void agrega()
 
     cout << "Inserte lugar: ";
     cin >> lugar;
-    cout << "Inserte estado: ";
+    cout << "Inserte municipio: ";
     cin >> estado;
     cout << "Inserte atracciones: ";
     cin >> atracciones;
 
-    cadena << "\n"
-           << id
+    cadena << id
            << "\t"
            << lugar
            << "\t"
@@ -221,9 +271,10 @@ void agrega()
            << atracciones;
 
     str = cadena.str();
-    datos << str;
+    datos << str << endl;
     datos.close();
-
+    
+    muestra_base();
 }
 
 int extrae_id(string linea)
@@ -316,6 +367,23 @@ vector<int> extrae_ids(vector<string> lineas)
     return id;
 }
 
+void limpia_lineas_vacias(string archivo){
+	ifstream arch(archivo.c_str());
+	ofstream out("temp.txt");
+	string line;
+	
+	while(getline(arch,line)){
+		if(!line.empty()){
+			out << line << endl;
+		}
+	}
+	arch.close();
+	out.close();
+	
+	remove(archivo.c_str());
+	rename("temp.txt",archivo.c_str());
+}
+
 void ascendente()
 {
     int k;
@@ -344,10 +412,12 @@ void ascendente()
     }
 
     ofstream dat("datos.txt");
-    for(i=1; i<=lineas.size(); i++) {
+    for(i=0; i<lineas.size(); i++) {
         dat << lineas[i] << endl;
     }
     dat.close();
+    
+    limpia_lineas_vacias("datos.txt");
 }
 
 void descendente()
@@ -368,6 +438,8 @@ void descendente()
         dat << lineas[i] << endl;
     }
     dat.close();
+    
+    limpia_lineas_vacias("datos.txt");
 }
 
 void ordena()
@@ -412,6 +484,9 @@ void restaura()
 
 int main()
 {
+	escribe_visitas();
+	crea_datos();
+	
     int opcion;
     vector<int> id;
     vector<string> lugar;
